@@ -18,6 +18,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import { createAccount } from '@/lib/actions/user-actions';
+import OtpModal from './OtpModal';
 
 const authFormSchema = (formType: FormType) => {
 	return z.object({
@@ -148,6 +149,12 @@ const AuthForm = ({ type }: { type: FormType }) => {
 					</div>
 				</form>
 			</Form>
+			{/* Otp Verification */}
+			{true && (
+				<div>
+					<OtpModal email={form.getValues('email')} accountId={accountId} />
+				</div>
+			)}
 		</>
 	);
 };
