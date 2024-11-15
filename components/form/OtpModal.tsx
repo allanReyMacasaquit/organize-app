@@ -1,29 +1,29 @@
+'use client';
+
 import {
 	AlertDialog,
 	AlertDialogAction,
-	AlertDialogCancel,
 	AlertDialogContent,
 	AlertDialogDescription,
 	AlertDialogFooter,
 	AlertDialogHeader,
 	AlertDialogTitle,
-	AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
 import {
 	InputOTP,
 	InputOTPGroup,
-	InputOTPSeparator,
 	InputOTPSlot,
 } from '@/components/ui/input-otp';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Button } from '../ui/button';
+import { sendEmailOTP, verifySecret } from '@/lib/actions/user-actions';
 
 interface OtpModalProps {
 	email: string;
-	accountId: number;
+	accountId: string;
 }
 
 const OtpModal = ({ accountId, email }: OtpModalProps) => {
@@ -39,9 +39,9 @@ const OtpModal = ({ accountId, email }: OtpModalProps) => {
 		console.log({ accountId, password });
 
 		try {
-			// const sessionId = await verifySecret({ accountId, password });
-			// console.log({ sessionId });
-			// if (sessionId) router.push('/');
+			const sessionId = await verifySecret({ accountId, password });
+			console.log({ sessionId });
+			if (sessionId) router.push('/');
 		} catch (error) {
 			console.log('Failed to verify OTP', error);
 		}
@@ -50,7 +50,7 @@ const OtpModal = ({ accountId, email }: OtpModalProps) => {
 	};
 
 	const handleResendOtp = async () => {
-		// await sendEmailOTP({ email });
+		await sendEmailOTP({ email });
 	};
 
 	return (
@@ -71,7 +71,7 @@ const OtpModal = ({ accountId, email }: OtpModalProps) => {
 					</AlertDialogTitle>
 					<AlertDialogDescription className='subtitle-2 text-center text-light-100'>
 						We&apos;ve sent a code to
-						<span className='pl-1 text-brand'>{email}@Email.com</span>
+						<span className='pl-1 text-brand'>{email}</span>
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 				<InputOTP maxLength={6} value={password} onChange={setPassword}>
