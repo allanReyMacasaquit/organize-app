@@ -15,7 +15,8 @@ const AuthLayout = ({ children }: LayoutFormProps) => {
 						alt='logo'
 						height={100}
 						width={100}
-						className='h-auto'
+						priority
+						className='h-auto lg:w-[224px]'
 					/>
 					<div className='space-y-5 text-white'>
 						<h1 className='h1'>Manage your files the best way</h1>
@@ -29,7 +30,8 @@ const AuthLayout = ({ children }: LayoutFormProps) => {
 						alt='logo'
 						height={342}
 						width={342}
-						className='transition-all hover:rotate-2 hover:scale-105 ml-5'
+						priority
+						className='w-auto transition-all hover:rotate-2 hover:scale-105 ml-5 lg:w-[350px]'
 					/>
 				</div>
 			</section>
@@ -40,7 +42,8 @@ const AuthLayout = ({ children }: LayoutFormProps) => {
 						alt='logo'
 						height={82}
 						width={224}
-						className='h-auto w-[200px] lg:w-[250px]'
+						className='w-auto lg:w-[250px]'
+						priority
 					/>
 				</div>
 				{children}
