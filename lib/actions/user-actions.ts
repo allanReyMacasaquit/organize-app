@@ -1,10 +1,11 @@
 'use server';
 
 import { ID, Query } from 'appwrite';
-import { createAdminClient } from '../appwrite';
+import { createAdminClient, createSessionClient } from '../appwrite';
 import { appwriteConfig } from '../appwrite/config';
 import { parseStringify } from '../utils';
 import { cookies } from 'next/headers';
+import { avatarPlaceholder } from '@/constants';
 
 const getUserByEmail = async (email: string) => {
 	const { databases } = await createAdminClient();
@@ -57,8 +58,7 @@ export const createAccount = async ({
 			{
 				fullName,
 				email,
-				avatar:
-					'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png',
+				avatar: avatarPlaceholder,
 				accountId,
 			}
 		);
@@ -91,4 +91,23 @@ export const verifySecret = async ({
 	} catch (error) {
 		handleError(error, 'Failed to verify OTP');
 	}
+};
+export const getCurrentUser = async () => {
+	const { databases, account } = await createSessionClient();
+
+	// Fetch the currently authenticated user's account
+	const result = await account.get();
+
+	// Query the database for the user's document based on their account ID
+	const user = await databases.listDocuments(
+		appwriteConfig.databaseId,
+		appwriteConfig.usersCollectionId,
+		[Query.equal('accountId', result.$id)] // Query filters for accountId match
+	);
+
+	// Return `null` if no user document is found
+	if (user.total <= 0) return null;
+
+	// Return the first user document found, parsed into a string if needed
+	return parseStringify(user.documents[0]);
 };
