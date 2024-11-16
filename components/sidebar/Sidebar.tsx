@@ -12,7 +12,7 @@ interface SidebarProps {
 	avatar?: string;
 }
 
-const Sidebar = ({ fullName, email }: SidebarProps) => {
+const Sidebar = ({ fullName, email, avatar }: SidebarProps) => {
 	const pathname = usePathname();
 	return (
 		<aside className='sidebar'>
@@ -66,20 +66,21 @@ const Sidebar = ({ fullName, email }: SidebarProps) => {
 					alt='files'
 					width={100}
 					height={100}
+					priority
 					className='w-[100px] transition-all hover:rotate-2 hover:scale-105'
 				/>
 				<p className='text-brand h2 hidden lg:flex'>Files</p>
 			</div>
 			<div className='sidebar-user-info'>
 				<Image
-					src={avatarPlaceholder}
+					src={avatarPlaceholder || avatar}
 					alt='avatar'
 					width={100}
 					height={100}
 					className='w-full sidebar-user-avatar'
 				/>
 				<div className='hidden lg:block'>
-					<p className='subtitle-2'>{fullName}</p>
+					<p className='subtitle-2 capitalize'>{fullName}</p>
 					<p className='caption'>{email}</p>
 				</div>
 			</div>
