@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 import { Button } from '../ui/button';
 import FileUploader from '../header/FileUploader';
+import { signOutUser } from '@/lib/actions/user-actions';
 
 interface MobileNavigationProps {
 	fullName: string;
@@ -98,7 +99,7 @@ const MobileNavigation = ({
 					<div className='flex flex-col justify-between gap-5'>
 						<FileUploader />
 						<Button
-							onClick={() => {}}
+							onClick={async () => await signOutUser()}
 							type='submit'
 							className='mobile-sign-out-button'
 						>
