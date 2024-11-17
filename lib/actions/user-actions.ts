@@ -1,12 +1,13 @@
 'use server';
 
-import { ID, Query } from 'appwrite';
+import { ID, Query } from 'node-appwrite';
 import { createAdminClient, createSessionClient } from '../appwrite';
 import { appwriteConfig } from '../appwrite/config';
 import { parseStringify } from '../utils';
 import { cookies } from 'next/headers';
-import { avatarPlaceholder } from '@/constants';
+
 import { redirect } from 'next/navigation';
+import { avatarPlaceholderUrl } from '@/constants';
 
 const getUserByEmail = async (email: string) => {
 	const { databases } = await createAdminClient();
@@ -59,7 +60,7 @@ export const createAccount = async ({
 			{
 				fullName,
 				email,
-				avatar: avatarPlaceholder,
+				avatar: avatarPlaceholderUrl,
 				accountId,
 			}
 		);
@@ -68,14 +69,13 @@ export const createAccount = async ({
 	return parseStringify({ accountId });
 };
 
-interface VerifySecretProps {
-	accountId: string;
-	password: string;
-}
 export const verifySecret = async ({
 	accountId,
 	password,
-}: VerifySecretProps) => {
+}: {
+	accountId: string;
+	password: string;
+}) => {
 	try {
 		const { account } = await createAdminClient();
 
@@ -93,31 +93,32 @@ export const verifySecret = async ({
 		handleError(error, 'Failed to verify OTP');
 	}
 };
+
 export const getCurrentUser = async () => {
-	const { databases, account } = await createSessionClient();
+	try {
+		const { databases, account } = await createSessionClient();
+		const result = await account.get(); // `result.$id` represents the `accountId`
 
-	// Fetch the currently authenticated user's account
-	const result = await account.get();
+		const user = await databases.listDocuments(
+			appwriteConfig.databaseId,
+			appwriteConfig.usersCollectionId,
+			[Query.equal('accountId', result.$id)]
+		);
 
-	// Query the database for the user's document based on their account ID
-	const user = await databases.listDocuments(
-		appwriteConfig.databaseId,
-		appwriteConfig.usersCollectionId,
-		[Query.equal('accountId', result.$id)] // Query filters for accountId match
-	);
+		if (user.total <= 0) return null;
 
-	// Return `null` if no user document is found
-	if (user.total <= 0) return null;
-
-	// Return the first user document found, parsed into a string if needed
-	return parseStringify(user.documents[0]);
+		const userData = parseStringify(user.documents[0]);
+		return { ...userData, accountId: result.$id }; // Include `accountId` in the returned object
+	} catch (error) {
+		console.log(error);
+	}
 };
+
 export const signOutUser = async () => {
 	const { account } = await createSessionClient();
 
 	try {
 		await account.deleteSession('current');
-
 		(await cookies()).delete('appwrite-session');
 	} catch (error) {
 		handleError(error, 'Failed to sign out user');
@@ -125,6 +126,7 @@ export const signOutUser = async () => {
 		redirect('/sign-in');
 	}
 };
+
 export const signInUser = async ({ email }: { email: string }) => {
 	try {
 		const existingUser = await getUserByEmail(email);

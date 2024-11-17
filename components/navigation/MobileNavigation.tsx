@@ -6,7 +6,7 @@ import {
 	SheetTitle,
 	SheetTrigger,
 } from '@/components/ui/sheet';
-import { avatarPlaceholder, navItems } from '@/constants';
+import { avatarPlaceholderUrl, navItems } from '@/constants';
 import Image from 'next/image';
 import { useState } from 'react';
 import { Separator } from '../ui/separator';
@@ -14,22 +14,25 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 import { Button } from '../ui/button';
-import FileUploader from '../header/FileUploader';
-import { signOutUser } from '@/lib/actions/user-actions';
 
-interface MobileNavigationProps {
-	fullName: string;
-	email: string;
-	avatar?: string;
-	ownerId: string;
+import { signOutUser } from '@/lib/actions/user-actions';
+import FileUploader from '../header/FileUploader';
+
+interface Props {
+	$id: string;
 	accountId: string;
+	fullName: string;
+	avatar: string;
+	email: string;
 }
 
 const MobileNavigation = ({
+	$id: ownerId,
+	accountId,
+	avatar,
 	email,
 	fullName,
-	avatar,
-}: MobileNavigationProps) => {
+}: Props) => {
 	const pathname = usePathname();
 
 	const [open, setOpen] = useState(false);
@@ -56,7 +59,7 @@ const MobileNavigation = ({
 					<SheetTitle>
 						<div className='header-user'>
 							<Image
-								src={avatarPlaceholder || avatar}
+								src={avatarPlaceholderUrl || avatar}
 								alt='avatar'
 								width={30}
 								height={30}
@@ -97,7 +100,7 @@ const MobileNavigation = ({
 					</nav>
 					<Separator className='my-5 bg-light-200/20' />
 					<div className='flex flex-col justify-between gap-5'>
-						<FileUploader />
+						<FileUploader accountId={accountId} ownerId={ownerId} />
 						<Button
 							onClick={async () => await signOutUser()}
 							type='submit'

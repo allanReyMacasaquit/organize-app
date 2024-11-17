@@ -20,6 +20,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Button } from '../ui/button';
 import { sendEmailOTP, verifySecret } from '@/lib/actions/user-actions';
+import { useToast } from '@/hooks/use-toast';
 
 interface OtpModalProps {
 	email: string;
@@ -27,6 +28,7 @@ interface OtpModalProps {
 }
 
 const OtpModal = ({ accountId, email }: OtpModalProps) => {
+	const { toast } = useToast();
 	const router = useRouter();
 	const [isOpen, setIsOpen] = useState(true);
 	const [password, setPassword] = useState('');
@@ -36,14 +38,12 @@ const OtpModal = ({ accountId, email }: OtpModalProps) => {
 		e.preventDefault();
 		setIsLoading(true);
 
-		console.log({ accountId, password });
-
 		try {
 			const sessionId = await verifySecret({ accountId, password });
-			console.log({ sessionId });
+
 			if (sessionId) router.push('/');
 		} catch (error) {
-			console.log('Failed to verify OTP', error);
+			if (error instanceof Error) toast({ description: 'Failed to Open OTP' });
 		}
 
 		setIsLoading(false);
